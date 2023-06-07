@@ -1,8 +1,67 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+}
+
+enum TransferStatus {
+  PENDING
+  APPROVED
+  REFUSED
+}
+
+model Credential {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user       String    @db.VarChar(255)
+  hash       String    @db.VarChar(255)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("credentials")
+}
+
+model Holder {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document   String    @unique @db.VarChar(30)
+  name       String    @db.VarChar(255)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  Accounts   Account[]
+
+  @@map("holders")
+}
+
+model Account {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  holder_id  String    @db.VarChar(36)
+  number     String    @db.VarChar(21)
+  branch     String    @db.VarChar(6)
+  balance    Decimal   @db.Decimal(12, 2)
+  active     Boolean
+  blocked    Boolean
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  holder   Holder     @relation(fields: [holder_id], references: [id])
+  Transfer Transfer[]
+
+  @@map("accounts")
+}
+
+model Transfer {
+  id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  account_id String         @db.VarChar(36)
+  amount     Decimal        @db.Decimal(12, 2)
+  credit     Boolean
+  status     TransferStatus
+  message    String         @db.VarChar(255)
+  created_at DateTime?      @default(now())
+  updated_at DateTime?      @default(now())
+
+  holder Account @relation(fields: [account_id], references: [id])
+
+  @@map("transfers")
 }
