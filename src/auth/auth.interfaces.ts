@@ -11,5 +11,5 @@ export interface IAuthController {
 export interface IAuthService {
   signIn(user: string, pass: string): Promise<Credential>;
   logIn(user: string, pass: string): Promise<ILogInResponse>;
-  verify(): boolean;
+  verify(token: string): boolean;
 }
