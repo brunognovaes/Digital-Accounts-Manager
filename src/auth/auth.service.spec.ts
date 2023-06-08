@@ -18,15 +18,15 @@ const mockCredential = {
   updated_at: '01-01-01T00:00:00Z',
 };
 
-const prismaMock = {
+const mockPrisma = {
   credential: {
-    findUnique: () => mockCredential,
-    create: () => mockCredential,
+    findUnique: async () => mockCredential,
+    create: async () => mockCredential,
   },
 };
 
-const jwtMock = {
-  signAsync: () => mockToken,
+const mockJwt = {
+  signAsync: async () => mockToken,
   verify: () => ({ user: mockUser }),
 };
 
@@ -39,11 +39,11 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: JwtService,
-          useValue: jwtMock,
+          useValue: mockJwt,
         },
         {
           provide: PrismaService,
-          useValue: prismaMock,
+          useValue: mockPrisma,
         },
       ],
     }).compile();
@@ -71,8 +71,8 @@ describe('AuthService', () => {
 
     it('should throw an error when user not exists', () => {
       jest
-        .spyOn(prismaMock.credential, 'findUnique')
-        .mockImplementation(() => null);
+        .spyOn(mockPrisma.credential, 'findUnique')
+        .mockImplementation(async () => null);
 
       const response = authService.logIn(mockUser, mockPass);
 
@@ -95,8 +95,8 @@ describe('AuthService', () => {
   describe('signIn', () => {
     it("should create successfully a credential when user isn't already registered", () => {
       jest
-        .spyOn(prismaMock.credential, 'findUnique')
-        .mockImplementation(() => null);
+        .spyOn(mockPrisma.credential, 'findUnique')
+        .mockImplementation(async () => null);
       jest.spyOn(bcrypt, 'hash').mockImplementation(() => mockHash);
 
       const response = authService.signIn(mockUser, mockPass);
@@ -123,7 +123,7 @@ describe('AuthService', () => {
     });
 
     it('should return false when token is invalid', () => {
-      jest.spyOn(jwtMock, 'verify').mockImplementation(() => {
+      jest.spyOn(mockJwt, 'verify').mockImplementation(() => {
         throw new Error('Fail on verify');
       });
 
