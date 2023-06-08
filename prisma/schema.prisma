@@ -15,7 +15,7 @@ enum TransferStatus {
 
 model Credential {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user       String    @db.VarChar(255)
+  user       String    @unique @db.VarChar(255)
   hash       String    @db.VarChar(255)
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
