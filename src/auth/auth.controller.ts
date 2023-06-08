@@ -1,4 +1,11 @@
-import { Controller, Inject, Post, Req } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+  Req,
+} from '@nestjs/common';
 import {
   IAuthController,
   IAuthService,
@@ -12,6 +19,7 @@ import authErrors from './auth.errors';
 export class AuthController implements IAuthController {
   constructor(@Inject(AuthService) private authService: IAuthService) {}
 
+  @HttpCode(HttpStatus.OK)
   @Post()
   async logIn(@Req() req: Request): Promise<ILogInResponse> {
     const authorization = req.headers['authorization'];
@@ -22,7 +30,7 @@ export class AuthController implements IAuthController {
 
     const [schema, token] = authorization.split(' ');
 
-    if (schema !== 'basic') {
+    if (schema !== 'Basic') {
       throw authErrors.INCORRECT_SCHEMA;
     }
 
