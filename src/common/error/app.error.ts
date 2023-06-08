@@ -6,6 +6,7 @@ export enum ErrorCodes {
   DUPLICATED_VALUE = 'app.dupl.val',
   MISSING_AUTHORIZATION = 'app.miss.auth',
   INCORRECT_SCHEMA = 'app.incr.schm',
+  NOT_FOUND = 'app.not.found',
 }
 
 export class AppError extends Error {

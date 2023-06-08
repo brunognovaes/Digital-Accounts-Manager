@@ -6,8 +6,9 @@ import { PrismaService } from 'src/prisma.service';
 
 const mockName = 'name';
 const mockDocument = 'document';
+const mockId = 'uuid';
 const mockHolder = {
-  id: 'uuid',
+  id: mockId,
   name: mockName,
   document: mockDocument,
   created_at: '01-01-01T00:00:00Z',
@@ -42,9 +43,7 @@ describe('HoldersService', () => {
 
   describe('create', () => {
     it('should create a holder successfully', () => {
-      jest
-        .spyOn(mockPrisma.holder, 'findUnique')
-        .mockImplementation(async () => null);
+      jest.spyOn(mockPrisma.holder, 'findUnique').mockResolvedValue(null);
 
       const response = holdersService.create({
         document: mockDocument,
@@ -64,6 +63,25 @@ describe('HoldersService', () => {
       expect(response).rejects.toBeDefined();
       expect(response).rejects.toThrowError(AppError);
       expect(response).rejects.toEqual(holdersErrors.ALREADY_REGISTERED);
+    });
+  });
+
+  describe('getById', () => {
+    it('should return a holder successfully', () => {
+      const response = holdersService.getById(mockId);
+
+      expect(response).resolves.toBeDefined();
+      expect(response).resolves.toEqual(mockHolder);
+    });
+
+    it('should throw an error when holder not found', () => {
+      jest.spyOn(mockPrisma.holder, 'findUnique').mockResolvedValue(null);
+
+      const response = holdersService.getById(mockId);
+
+      expect(response).rejects.toBeDefined();
+      expect(response).rejects.toThrowError(AppError);
+      expect(response).rejects.toEqual(holdersErrors.NOT_FOUND);
     });
   });
 });

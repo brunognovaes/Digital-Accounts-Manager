@@ -7,4 +7,9 @@ export default {
     HttpStatus.CONFLICT,
     ErrorCodes.DUPLICATED_VALUE,
   ),
+  NOT_FOUND: new AppError(
+    'Holder not found.',
+    HttpStatus.NOT_FOUND,
+    ErrorCodes.NOT_FOUND,
+  ),
 };
