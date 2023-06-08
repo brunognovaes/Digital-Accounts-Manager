@@ -84,4 +84,23 @@ describe('HoldersService', () => {
       expect(response).rejects.toEqual(holdersErrors.NOT_FOUND);
     });
   });
+
+  describe('getByDocument', () => {
+    it('should return a holder successfully', () => {
+      const response = holdersService.getByDocument(mockDocument);
+
+      expect(response).resolves.toBeDefined();
+      expect(response).resolves.toEqual(mockHolder);
+    });
+
+    it('should throw an error when holder not found', () => {
+      jest.spyOn(mockPrisma.holder, 'findUnique').mockResolvedValue(null);
+
+      const response = holdersService.getByDocument(mockDocument);
+
+      expect(response).rejects.toBeDefined();
+      expect(response).rejects.toThrowError(AppError);
+      expect(response).rejects.toEqual(holdersErrors.NOT_FOUND);
+    });
+  });
 });
