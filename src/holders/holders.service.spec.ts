@@ -14,7 +14,7 @@ const mockHolder = {
   updated_at: '01-01-01T00:00:00Z',
 };
 const mockPrisma = {
-  holders: {
+  holder: {
     create: async () => mockHolder,
     findUnique: async () => mockHolder,
   },
@@ -33,7 +33,7 @@ describe('HoldersService', () => {
 
     holdersService = module.get<HoldersService>(HoldersService);
 
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   it('should be defined', () => {
@@ -43,7 +43,7 @@ describe('HoldersService', () => {
   describe('create', () => {
     it('should create a holder successfully', () => {
       jest
-        .spyOn(mockPrisma.holders, 'findUnique')
+        .spyOn(mockPrisma.holder, 'findUnique')
         .mockImplementation(async () => null);
 
       const response = holdersService.create({
