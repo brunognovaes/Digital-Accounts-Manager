@@ -7,6 +7,25 @@ import holdersErrors from './holders.errors';
 @Injectable()
 export class HoldersService implements IHoldersService {
   constructor(private prismaService: PrismaService) {}
+
+  async delete(id: string): Promise<void> {
+    const holder = await this.prismaService.holder.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!holder) {
+      throw holdersErrors.NOT_FOUND;
+    }
+
+    await this.prismaService.holder.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
   async getByDocument(document: string): Promise<Holder> {
     const holder = await this.prismaService.holder.findUnique({
       where: { document },
