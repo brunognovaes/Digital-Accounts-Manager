@@ -25,6 +25,11 @@ const prismaMock = {
   },
 };
 
+const jwtMock = {
+  signAsync: () => mockToken,
+  verify: () => ({ user: mockUser }),
+};
+
 describe('AuthService', () => {
   let authService: AuthService;
 
@@ -34,9 +39,7 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: JwtService,
-          useValue: {
-            signAsync: () => mockToken,
-          },
+          useValue: jwtMock,
         },
         {
           provide: PrismaService,
@@ -108,6 +111,26 @@ describe('AuthService', () => {
       expect(response).rejects.toBeDefined();
       expect(response).rejects.toThrowError(AppError);
       expect(response).rejects.toEqual(authErrors.ALREADY_REGISTERED);
+    });
+  });
+
+  describe('verify', () => {
+    it('should return true when token is valid', () => {
+      const response = authService.verify(mockToken);
+
+      expect(response).toBeDefined();
+      expect(response).toBe(true);
+    });
+
+    it('should return false when token is invalid', () => {
+      jest.spyOn(jwtMock, 'verify').mockImplementation(() => {
+        throw new Error('Fail on verify');
+      });
+
+      const response = authService.verify(mockToken);
+
+      expect(response).toBeDefined();
+      expect(response).toBe(false);
     });
   });
 });
