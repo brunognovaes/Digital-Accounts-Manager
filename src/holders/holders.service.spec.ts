@@ -18,6 +18,7 @@ const mockPrisma = {
   holder: {
     create: async () => mockHolder,
     findUnique: async () => mockHolder,
+    delete: async () => mockHolder,
   },
 };
 
@@ -97,6 +98,24 @@ describe('HoldersService', () => {
       jest.spyOn(mockPrisma.holder, 'findUnique').mockResolvedValue(null);
 
       const response = holdersService.getByDocument(mockDocument);
+
+      expect(response).rejects.toBeDefined();
+      expect(response).rejects.toThrowError(AppError);
+      expect(response).rejects.toEqual(holdersErrors.NOT_FOUND);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a holder successfully', () => {
+      const response = holdersService.delete(mockId);
+
+      expect(response).resolves.not.toBeDefined();
+    });
+
+    it('should throw an error when holder not found', () => {
+      jest.spyOn(mockPrisma.holder, 'findUnique').mockResolvedValue(null);
+
+      const response = holdersService.delete(mockId);
 
       expect(response).rejects.toBeDefined();
       expect(response).rejects.toThrowError(AppError);

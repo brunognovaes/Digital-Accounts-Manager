@@ -7,4 +7,5 @@ export interface IHoldersService {
   create(data: ICreateHolderData): Promise<Holder>;
   getById(id: string): Promise<Holder>;
   getByDocument(document: string): Promise<Holder>;
+  delete(id: string): Promise<void>;
 }
