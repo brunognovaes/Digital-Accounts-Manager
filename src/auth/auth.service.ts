@@ -4,6 +4,9 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
 import * as bcrypt from 'bcrypt';
 import authErrors from './auth.errors';
+import { Credential } from '@prisma/client';
+
+const DEFAULT_ROUNDS = 10;
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -12,8 +15,27 @@ export class AuthService implements IAuthService {
     private prismaService: PrismaService,
   ) {}
 
-  signIn(user: string, pass: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async signIn(user: string, pass: string): Promise<Credential> {
+    const alreadyRegistered = await this.prismaService.credential.findUnique({
+      where: {
+        user,
+      },
+    });
+
+    if (alreadyRegistered) {
+      throw authErrors.ALREADY_REGISTERED;
+    }
+
+    const hash = await bcrypt.hash(pass, DEFAULT_ROUNDS);
+
+    const credentials = await this.prismaService.credential.create({
+      data: {
+        hash,
+        user,
+      },
+    });
+
+    return credentials;
   }
 
   async logIn(user: string, pass: string): Promise<ILogInResponse> {
