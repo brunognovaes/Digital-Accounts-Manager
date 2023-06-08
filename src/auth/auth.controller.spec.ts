@@ -9,7 +9,7 @@ const mockUser = '123456789';
 const mockPass = '123456789';
 const mockReq = {
   headers: {
-    authorization: 'basic authorization',
+    authorization: 'Basic authorization',
   },
 } as Request;
 
