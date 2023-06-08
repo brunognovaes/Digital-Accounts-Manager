@@ -7,4 +7,9 @@ export default {
     HttpStatus.UNAUTHORIZED,
     ErrorCodes.INVALID_CREDENTIALS,
   ),
+  ALREADY_REGISTERED: new AppError(
+    'User already registered.',
+    HttpStatus.CONFLICT,
+    ErrorCodes.DUPLICATED_VALUE,
+  ),
 };
