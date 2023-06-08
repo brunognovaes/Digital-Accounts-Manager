@@ -4,6 +4,8 @@ export enum ErrorCodes {
   UNKNOW = 'app.unknow',
   INVALID_CREDENTIALS = 'auth.inv.cred',
   DUPLICATED_VALUE = 'app.dupl.val',
+  MISSING_AUTHORIZATION = 'app.miss.auth',
+  INCORRECT_SCHEMA = 'app.incr.schm',
 }
 
 export class AppError extends Error {

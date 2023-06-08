@@ -1,11 +1,12 @@
 import { Credential } from '@prisma/client';
+import { Request } from 'express';
 
 export interface ILogInResponse {
   token: string;
 }
 
 export interface IAuthController {
-  logIn(user: string, pass: string): Promise<ILogInResponse>;
+  logIn(req: Request): Promise<ILogInResponse>;
 }
 
 export interface IAuthService {
