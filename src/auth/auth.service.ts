@@ -55,14 +55,27 @@ export class AuthService implements IAuthService {
       throw authErrors.INVALID_CREDENTIALS;
     }
 
-    const token = await this.jwtService.signAsync({
-      user,
-    });
+    const token = await this.jwtService.signAsync(
+      {
+        user,
+      },
+      {
+        secret: process.env.SECRET,
+      },
+    );
 
     return { token };
   }
 
-  verify(): boolean {
-    throw new Error('Method not implemented.');
+  verify(token: string): boolean {
+    try {
+      this.jwtService.verify<{ user: string }>(token, {
+        secret: process.env.SECRET,
+      });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
