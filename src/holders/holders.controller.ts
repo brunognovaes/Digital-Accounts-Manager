@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -6,6 +7,7 @@ import {
   HttpStatus,
   Inject,
   Param,
+  ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
 import { Holder } from '@prisma/client';
@@ -24,14 +26,16 @@ export class HoldersController implements IHoldersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(data: CreateHolderDto): Promise<Holder> {
+  async create(@Body() data: CreateHolderDto): Promise<Holder> {
     await this.authService.signIn(data.document, data.password);
+    delete data.password;
+
     return this.holdersService.create(data);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  getById(@Param('id') id: string): Promise<Holder> {
+  getById(@Param('id', ParseUUIDPipe) id: string): Promise<Holder> {
     return this.holdersService.getById(id);
   }
 
@@ -43,7 +47,7 @@ export class HoldersController implements IHoldersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(id: string): Promise<void> {
+  async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     const holder = await this.holdersService.delete(id);
     await this.authService.delete(holder.document);
   }
