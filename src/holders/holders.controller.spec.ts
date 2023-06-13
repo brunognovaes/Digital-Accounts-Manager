@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { AccountsService } from 'src/accounts/accounts.service';
 import { AuthService } from 'src/auth/auth.service';
 import { HoldersController } from './holders.controller';
 import { HoldersService } from './holders.service';
@@ -37,6 +38,10 @@ const mockAuthService = {
   delete: jest.fn().mockImplementation(async () => mockCredential),
 };
 
+const mockAccountsService = {
+  inactiveAccountsByHolder: jest.fn().mockImplementation(async () => null),
+};
+
 describe('HoldersController', () => {
   let holdersController: HoldersController;
 
@@ -51,6 +56,10 @@ describe('HoldersController', () => {
         {
           provide: AuthService,
           useValue: mockAuthService,
+        },
+        {
+          provide: AccountsService,
+          useValue: mockAccountsService,
         },
       ],
     }).compile();
@@ -88,6 +97,9 @@ describe('HoldersController', () => {
       expect(response).not.toBeDefined();
       expect(mockAuthService.delete).toHaveBeenCalledTimes(1);
       expect(mockHoldersService.delete).toHaveBeenCalledTimes(1);
+      expect(
+        mockAccountsService.inactiveAccountsByHolder,
+      ).toHaveBeenCalledTimes(1);
     });
   });
 

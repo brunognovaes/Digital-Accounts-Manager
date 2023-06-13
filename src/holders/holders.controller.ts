@@ -11,6 +11,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { Holder } from '@prisma/client';
+import { AccountsService } from 'src/accounts/accounts.service';
 import { IAuthService } from 'src/auth/auth.interfaces';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateHolderDto } from './dtos/create-holder.dto';
@@ -22,6 +23,7 @@ export class HoldersController implements IHoldersController {
   constructor(
     @Inject(HoldersService) private holdersService: IHoldersService,
     @Inject(AuthService) private authService: IAuthService,
+    @Inject(AccountsService) private accountsService: AccountsService,
   ) {}
 
   @Post()
@@ -48,6 +50,7 @@ export class HoldersController implements IHoldersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    await this.accountsService.inactiveAccountsByHolder(id);
     const holder = await this.holdersService.delete(id);
     await this.authService.delete(holder.document);
   }
