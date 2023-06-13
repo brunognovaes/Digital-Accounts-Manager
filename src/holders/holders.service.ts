@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { ICreateHolderData, IHoldersService } from './holders.interfaces';
 import { Holder } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import holdersErrors from './holders.errors';
+import { ICreateHolderData, IHoldersService } from './holders.interfaces';
 
 @Injectable()
 export class HoldersService implements IHoldersService {
   constructor(private prismaService: PrismaService) {}
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<Holder> {
     const holder = await this.prismaService.holder.findUnique({
       where: {
         id,
@@ -19,7 +19,7 @@ export class HoldersService implements IHoldersService {
       throw holdersErrors.NOT_FOUND;
     }
 
-    await this.prismaService.holder.delete({
+    return this.prismaService.holder.delete({
       where: {
         id,
       },
