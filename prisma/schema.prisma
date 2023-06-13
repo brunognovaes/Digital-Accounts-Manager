@@ -29,7 +29,6 @@ model Holder {
   name       String    @db.VarChar(255)
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
-  Accounts   Account[]
 
   @@map("holders")
 }
@@ -45,9 +44,6 @@ model Account {
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
 
-  holder   Holder     @relation(fields: [holder_id], references: [id])
-  Transfer Transfer[]
-
   @@map("accounts")
 }
 
@@ -60,8 +56,6 @@ model Transfer {
   message    String?        @db.VarChar(255)
   created_at DateTime?      @default(now())
   updated_at DateTime?      @default(now())
-
-  account Account @relation(fields: [account_id], references: [id])
 
   @@map("transfers")
 }
