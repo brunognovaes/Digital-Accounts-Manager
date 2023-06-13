@@ -9,7 +9,8 @@ export enum ErrorCodes {
   NOT_FOUND = 'app.not.found',
   INACTIVE_ACCOUNT = 'acc.incv',
   BLOCKED_ACCOUNT = 'acc.blck',
-  INSUFFICIENT_BALANCE = 'acc.insf.bal'
+  INSUFFICIENT_BALANCE = 'acc.insf.bal',
+  ALREADY_PROCESSED = 'tran.alrd.proc'
 }
 
 export class AppError extends Error {
