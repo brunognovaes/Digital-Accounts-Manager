@@ -26,7 +26,7 @@ const mockTransfer: Transfer = {
 const mockPaginatedResponse: IPaginatedResponse<Transfer> = {
   metadata: {
     currentItems: 2,
-    maxPage: 0,
+    maxPage: 1,
     order: Prisma.SortOrder.desc,
     page: 0,
   },
@@ -71,7 +71,6 @@ describe('TransfersService', () => {
       const response = transfersService.create({
         amount: mockAmount,
         credit: true,
-        message: mockMessage,
         accountId: mockAccountId,
       });
 

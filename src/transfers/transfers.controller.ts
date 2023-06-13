@@ -10,10 +10,11 @@ import {
 import { Transfer, TransferStatus } from '@prisma/client';
 import { IAccountsService } from 'src/accounts/accounts.interfaces';
 import { AccountsService } from 'src/accounts/accounts.service';
+import { FilterQueryDto } from 'src/common/dtos/filter-query.dto';
 import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { CreateTransferDto } from './dtos/create-transfer.dto';
 import {
-  IListTransfersFilterQuery,
+  IFormatedTransferResponse,
   ITransfersController,
   ITransfersService,
 } from './transfers.interfaces';
@@ -26,22 +27,50 @@ export class TransfersController implements ITransfersController {
     @Inject(AccountsService) private accountsService: IAccountsService,
   ) {}
 
-  @Get(':id')
-  getById(@Param('id') id: string): Promise<Transfer> {
-    return this.transfersService.getById(id);
+  formatTransfer(tran: Transfer): IFormatedTransferResponse {
+    return {
+      id: tran.id,
+      account_id: tran.account_id,
+      amount: tran.amount.toNumber(),
+      credit: tran.credit,
+      status: tran.status,
+      ...(tran.message && { message: tran.message }),
+      created_at: tran.created_at,
+      updated_at: tran.updated_at,
+    };
   }
 
-  @Get()
-  list(
-    @Query() queries: IListTransfersFilterQuery,
-  ): Promise<IPaginatedResponse<Transfer>> {
-    return this.transfersService.list(queries);
+  @Get(':id')
+  async getById(@Param('id') id: string): Promise<IFormatedTransferResponse> {
+    const tran = await this.transfersService.getById(id);
+
+    return this.formatTransfer(tran);
+  }
+
+  @Get('/account/:accountId')
+  async list(
+    @Query() queries: FilterQueryDto,
+    @Param('accountId') accountId: string,
+  ): Promise<IPaginatedResponse<IFormatedTransferResponse>> {
+    const response = await this.transfersService.list({
+      ...queries,
+      accountId,
+    });
+    const transfers = response.values.map((tran) => this.formatTransfer(tran));
+
+    return {
+      metadata: response.metadata,
+      values: transfers,
+    };
   }
 
   @Post()
-  async create(@Body() data: CreateTransferDto): Promise<Transfer> {
+  async create(
+    @Body() data: CreateTransferDto,
+  ): Promise<IFormatedTransferResponse> {
     let transfer: Transfer;
     let status: TransferStatus;
+    let message: string = null;
 
     try {
       transfer = await this.transfersService.create(data);
@@ -57,8 +86,15 @@ export class TransfersController implements ITransfersController {
       console.log('TransfersController:create - ', error);
 
       status = TransferStatus.REFUSED;
+      message = error.message;
     }
 
-    return this.transfersService.processStatus(transfer.id, status);
+    const tran = await this.transfersService.processStatus(
+      transfer.id,
+      status,
+      message,
+    );
+
+    return this.formatTransfer(tran);
   }
 }

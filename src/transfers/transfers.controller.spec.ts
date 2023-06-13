@@ -3,6 +3,7 @@ import { Prisma, Transfer, TransferStatus } from '@prisma/client';
 import { AccountsService } from 'src/accounts/accounts.service';
 import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { TransfersController } from './transfers.controller';
+import { IFormatedTransferResponse } from './transfers.interfaces';
 import { TransfersService } from './transfers.service';
 
 const mockId = 'id';
@@ -15,6 +16,17 @@ const mockTransfer: Transfer = {
   id: mockId,
   account_id: mockAccountId,
   amount: new Prisma.Decimal(mockAmount),
+  credit: true,
+  message: mockMessage,
+  status: mockStatus,
+  created_at: new Date('01-01-01T00:00:00Z'),
+  updated_at: new Date('01-01-01T00:00:00Z'),
+};
+
+const mockFormatedTransfer: IFormatedTransferResponse = {
+  id: mockId,
+  account_id: mockAccountId,
+  amount: mockAmount,
   credit: true,
   message: mockMessage,
   status: mockStatus,
@@ -44,6 +56,17 @@ const mockPaginatedResponse: IPaginatedResponse<Transfer> = {
   values: [mockTransfer, mockTransfer],
 };
 
+const mockFormatedPaginatedResponse: IPaginatedResponse<IFormatedTransferResponse> =
+  {
+    metadata: {
+      currentItems: 2,
+      maxPage: 0,
+      order: Prisma.SortOrder.desc,
+      page: 0,
+    },
+    values: [mockFormatedTransfer, mockFormatedTransfer],
+  };
+
 const mockTransfersService = {
   processStatus: jest.fn().mockImplementation(async () => mockTransfer),
   create: jest.fn().mockImplementation(async () => mockTransfer),
@@ -70,6 +93,10 @@ describe('TransfersController', () => {
     }).compile();
 
     transfersController = module.get<TransfersController>(TransfersController);
+
+    jest
+      .spyOn(transfersController, 'formatTransfer')
+      .mockImplementation(() => mockFormatedTransfer);
   });
 
   afterEach(() => {
@@ -85,16 +112,16 @@ describe('TransfersController', () => {
       const response = await transfersController.create({
         amount: mockAmount,
         credit: true,
-        message: mockMessage,
         accountId: mockAccountId,
       });
 
-      expect(response).toEqual(mockTransfer);
+      expect(response).toEqual(mockFormatedTransfer);
       expect(mockTransfersService.create).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledWith(
         mockId,
         TransferStatus.APPROVED,
+        null,
       );
       expect(mockAccountsService.cashIn).toHaveBeenCalledTimes(1);
     });
@@ -107,16 +134,16 @@ describe('TransfersController', () => {
       const response = await transfersController.create({
         amount: mockAmount,
         credit: true,
-        message: mockMessage,
         accountId: mockAccountId,
       });
 
-      expect(response).toEqual(mockTransfer);
+      expect(response).toEqual(mockFormatedTransfer);
       expect(mockTransfersService.create).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledWith(
         mockId,
         TransferStatus.REFUSED,
+        'Testing refused status',
       );
       expect(mockAccountsService.cashIn).toHaveBeenCalledTimes(1);
     });
@@ -125,16 +152,16 @@ describe('TransfersController', () => {
       const response = await transfersController.create({
         amount: mockAmount,
         credit: false,
-        message: mockMessage,
         accountId: mockAccountId,
       });
 
-      expect(response).toEqual(mockTransfer);
+      expect(response).toEqual(mockFormatedTransfer);
       expect(mockTransfersService.create).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledWith(
         mockId,
         TransferStatus.APPROVED,
+        null,
       );
       expect(mockAccountsService.cashOut).toHaveBeenCalledTimes(1);
     });
@@ -147,16 +174,16 @@ describe('TransfersController', () => {
       const response = await transfersController.create({
         amount: mockAmount,
         credit: false,
-        message: mockMessage,
         accountId: mockAccountId,
       });
 
-      expect(response).toEqual(mockTransfer);
+      expect(response).toEqual(mockFormatedTransfer);
       expect(mockTransfersService.create).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledTimes(1);
       expect(mockTransfersService.processStatus).toHaveBeenCalledWith(
         mockId,
         TransferStatus.REFUSED,
+        'Testing refused status',
       );
       expect(mockAccountsService.cashOut).toHaveBeenCalledTimes(1);
     });
@@ -167,21 +194,24 @@ describe('TransfersController', () => {
       const response = await transfersController.getById(mockId);
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockTransfer);
+      expect(response).toEqual(mockFormatedTransfer);
       expect(mockTransfersService.getById).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('list', () => {
     it('should return transfers successfully', async () => {
-      const response = await transfersController.list({
-        itemsPerPage: 2,
-        order: Prisma.SortOrder.desc,
-        page: 0,
-      });
+      const response = await transfersController.list(
+        {
+          itemsPerPage: 2,
+          order: Prisma.SortOrder.desc,
+          page: 0,
+        },
+        mockAccountId,
+      );
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockPaginatedResponse);
+      expect(response).toEqual(mockFormatedPaginatedResponse);
       expect(mockTransfersService.list).toHaveBeenCalledTimes(1);
     });
   });

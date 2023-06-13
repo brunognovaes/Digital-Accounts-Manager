@@ -2,7 +2,6 @@ import {
   IsBoolean,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -20,8 +19,4 @@ export class CreateTransferDto {
   @IsNotEmpty()
   @IsNumber({ maxDecimalPlaces: 2 })
   amount: number;
-
-  @IsOptional()
-  @IsString()
-  message?: string;
 }

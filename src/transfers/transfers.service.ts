@@ -18,7 +18,6 @@ export class TransfersService implements ITransfersService {
       data: {
         amount: data.amount,
         credit: data.credit,
-        message: data.message,
         status: TransferStatus.PENDING,
         account_id: data.accountId,
       },
@@ -60,7 +59,7 @@ export class TransfersService implements ITransfersService {
     const maxItems = await this.prismaService.transfer.count({
       where,
     });
-    const maxPage = Math.floor(maxItems / queries.itemsPerPage) - 1;
+    const maxPage = Math.floor(maxItems / queries.itemsPerPage);
 
     const transfers = await this.prismaService.transfer.findMany({
       where,
@@ -80,7 +79,11 @@ export class TransfersService implements ITransfersService {
     };
   }
 
-  async processStatus(id: string, status: TransferStatus): Promise<Transfer> {
+  async processStatus(
+    id: string,
+    status: TransferStatus,
+    message?: string,
+  ): Promise<Transfer> {
     const transfer = await this.getById(id);
 
     if (transfer.status !== TransferStatus.PENDING) {
@@ -93,6 +96,7 @@ export class TransfersService implements ITransfersService {
       },
       data: {
         status,
+        ...(message && { message }),
       },
     });
   }
