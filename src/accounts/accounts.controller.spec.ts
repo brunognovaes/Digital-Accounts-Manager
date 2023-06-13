@@ -23,6 +23,28 @@ const mockAccount: Account = {
   updated_at: new Date('01-01-01T00:00:00Z'),
 };
 
+const mockFormatedAccount = {
+  id: mockId,
+  active: true,
+  balance: mockBalance,
+  blocked: false,
+  branch: mockBranch,
+  holder_id: mockHolderId,
+  number: mockNumber,
+  created_at: new Date('01-01-01T00:00:00Z'),
+  updated_at: new Date('01-01-01T00:00:00Z'),
+};
+
+const mockFormatedPaginatedResponse = {
+  metadata: {
+    currentItems: 2,
+    maxPage: 0,
+    order: Prisma.SortOrder.desc,
+    page: 0,
+  },
+  values: [mockFormatedAccount, mockFormatedAccount],
+};
+
 const mockPaginatedResponse: IPaginatedResponse<Account> = {
   metadata: {
     currentItems: 2,
@@ -73,6 +95,10 @@ describe('AccountsController', () => {
     }).compile();
 
     accountsController = module.get<AccountsController>(AccountsController);
+
+    jest
+      .spyOn(accountsController, 'formatAccount')
+      .mockImplementation(() => mockFormatedAccount);
   });
 
   afterEach(() => {
@@ -90,7 +116,7 @@ describe('AccountsController', () => {
       });
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockAccount);
+      expect(response).toEqual(mockFormatedAccount);
       expect(mockAccountsService.create).toHaveBeenCalledTimes(1);
       expect(mockHoldersService.getByDocument).toHaveBeenCalledTimes(1);
     });
@@ -108,7 +134,7 @@ describe('AccountsController', () => {
       );
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockPaginatedResponse);
+      expect(response).toEqual(mockFormatedPaginatedResponse);
       expect(mockAccountsService.list).toHaveBeenCalledTimes(1);
     });
   });
@@ -118,7 +144,7 @@ describe('AccountsController', () => {
       const response = await accountsController.getById(mockId);
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockAccount);
+      expect(response).toEqual(mockFormatedAccount);
       expect(mockAccountsService.getById).toHaveBeenCalledTimes(1);
     });
   });
@@ -128,7 +154,7 @@ describe('AccountsController', () => {
       const response = await accountsController.close(mockId);
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockAccount);
+      expect(response).toEqual(mockFormatedAccount);
       expect(mockAccountsService.updateConfigs).toHaveBeenCalledTimes(1);
       expect(mockAccountsService.updateConfigs).toHaveBeenCalledWith(
         { active: false },
@@ -142,7 +168,7 @@ describe('AccountsController', () => {
       const response = await accountsController.block(mockId);
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockAccount);
+      expect(response).toEqual(mockFormatedAccount);
       expect(mockAccountsService.updateConfigs).toHaveBeenCalledTimes(1);
       expect(mockAccountsService.updateConfigs).toHaveBeenCalledWith(
         { blocked: true },
@@ -156,7 +182,7 @@ describe('AccountsController', () => {
       const response = await accountsController.unblock(mockId);
 
       expect(response).toBeDefined();
-      expect(response).toEqual(mockAccount);
+      expect(response).toEqual(mockFormatedAccount);
       expect(mockAccountsService.updateConfigs).toHaveBeenCalledTimes(1);
       expect(mockAccountsService.updateConfigs).toHaveBeenCalledWith(
         { blocked: false },

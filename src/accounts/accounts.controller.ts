@@ -31,7 +31,7 @@ export class AccountsController implements IAccountsController {
     @Inject(HoldersService) private holdersService: IHoldersService,
   ) {}
 
-  private formatAccount(acc: Account): IFormatedAccountResponse {
+  formatAccount(acc: Account): IFormatedAccountResponse {
     return {
       id: acc.id,
       holder_id: acc.holder_id,
@@ -53,7 +53,7 @@ export class AccountsController implements IAccountsController {
     const holder = await this.holdersService.getByDocument(data.document);
 
     const account = await this.accountsService.create(holder.id);
-
+    console.log(account);
     return this.formatAccount(account);
   }
 

@@ -36,6 +36,7 @@ export interface IAccountsController {
   close(id: string): Promise<IFormatedAccountResponse>;
   block(id: string): Promise<IFormatedAccountResponse>;
   unblock(id: string): Promise<IFormatedAccountResponse>;
+  formatAccount(acc: Account): IFormatedAccountResponse;
 }
 
 export interface IAccountsService {
@@ -45,4 +46,5 @@ export interface IAccountsService {
   cashIn(accountId: string, amount: number): Promise<IUpdateBalanceReturn>;
   cashOut(accountId: string, amount: number): Promise<IUpdateBalanceReturn>;
   updateConfigs(data: UpdateAccountDto, accountId: string): Promise<Account>;
+  inactiveAccountsByHolder(holderId: string): Promise<void>;
 }

@@ -178,4 +178,16 @@ export class AccountsService implements IAccountsService {
       },
     });
   }
+
+  async inactiveAccountsByHolder(holderId: string): Promise<void> {
+    await this.prismaService.account.updateMany({
+      where: {
+        holder_id: holderId,
+        active: true,
+      },
+      data: {
+        active: false,
+      },
+    });
+  }
 }

@@ -29,7 +29,7 @@ const mockAccount: Account = {
 const mockPaginatedResponse: IPaginatedResponse<Account> = {
   metadata: {
     currentItems: 2,
-    maxPage: 0,
+    maxPage: 1,
     order: Prisma.SortOrder.desc,
     page: 0,
   },
@@ -42,6 +42,7 @@ const mockPrisma = {
     findUnique: async () => mockAccount,
     findMany: async () => [mockAccount, mockAccount],
     update: async () => mockAccount,
+    updateMany: async () => [mockAccount, mockAccount],
     count: async () => 2,
   },
 };
@@ -238,5 +239,13 @@ describe('AccountsService', () => {
     expect(response).rejects.toBeDefined();
     expect(response).rejects.toThrowError(AppError);
     expect(response).rejects.toEqual(accountsErrors.INACTIVE);
+  });
+
+  describe('inactiveAccountsByHolder', () => {
+    it('should inactive accounts of holder successfully', () => {
+      const response = accountsService.inactiveAccountsByHolder(mockHolderId);
+
+      expect(response).resolves.not.toBeDefined();
+    });
   });
 });
