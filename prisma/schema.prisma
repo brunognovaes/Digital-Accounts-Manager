@@ -57,11 +57,11 @@ model Transfer {
   amount     Decimal        @db.Decimal(12, 2)
   credit     Boolean
   status     TransferStatus
-  message    String         @db.VarChar(255)
+  message    String?        @db.VarChar(255)
   created_at DateTime?      @default(now())
   updated_at DateTime?      @default(now())
 
-  holder Account @relation(fields: [account_id], references: [id])
+  account Account @relation(fields: [account_id], references: [id])
 
   @@map("transfers")
 }
