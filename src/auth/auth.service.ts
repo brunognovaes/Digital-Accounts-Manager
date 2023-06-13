@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { IAuthService, ILogInResponse } from './auth.interfaces';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma.service';
-import * as bcrypt from 'bcrypt';
-import authErrors from './auth.errors';
 import { Credential } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma.service';
+import authErrors from './auth.errors';
+import { IAuthService, ILogInResponse } from './auth.interfaces';
 
 const DEFAULT_ROUNDS = 10;
 
@@ -14,6 +14,24 @@ export class AuthService implements IAuthService {
     private jwtService: JwtService,
     private prismaService: PrismaService,
   ) {}
+
+  async delete(user: string): Promise<void> {
+    const credential = await this.prismaService.credential.findUnique({
+      where: {
+        user,
+      },
+    });
+
+    if (!credential) {
+      throw authErrors.NOT_FOUND;
+    }
+
+    await this.prismaService.credential.delete({
+      where: {
+        user
+      }
+    })
+  }
 
   async signIn(user: string, pass: string): Promise<Credential> {
     const alreadyRegistered = await this.prismaService.credential.findUnique({

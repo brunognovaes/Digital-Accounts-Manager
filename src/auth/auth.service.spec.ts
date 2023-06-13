@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma.service';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { AppError } from 'src/common/error/app.error';
+import { PrismaService } from 'src/prisma.service';
 import authErrors from './auth.errors';
+import { AuthService } from './auth.service';
 
 const mockUser = 'user';
 const mockPass = 'pass';
@@ -22,6 +22,7 @@ const mockPrisma = {
   credential: {
     findUnique: async () => mockCredential,
     create: async () => mockCredential,
+    delete: async () => mockCredential
   },
 };
 
@@ -133,4 +134,24 @@ describe('AuthService', () => {
       expect(response).toBe(false);
     });
   });
+
+  describe('delete', () => {
+    it('should delete a user that exists', () => {
+      const response = authService.delete(mockUser)
+
+      expect(response).resolves.not.toBeDefined()
+    })
+
+    it('should throw an error when credential not found', () => {
+      jest
+      .spyOn(mockPrisma.credential, 'findUnique')
+      .mockImplementation(async () => null);
+
+      const response = authService.delete(mockUser)
+
+      expect(response).rejects.toBeDefined();
+      expect(response).rejects.toThrowError(AppError);
+      expect(response).rejects.toEqual(authErrors.NOT_FOUND);
+    })
+  })
 });
