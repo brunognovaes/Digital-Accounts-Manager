@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { HoldersService } from './holders.service';
+import { PrismaService } from 'src/prisma.service';
 import { HoldersController } from './holders.controller';
+import { HoldersService } from './holders.service';
 
 @Module({
-  providers: [HoldersService],
+  providers: [HoldersService, PrismaService],
   controllers: [HoldersController]
 })
 export class HoldersModule {}
