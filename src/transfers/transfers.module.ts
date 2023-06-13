@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AccountsModule } from 'src/accounts/accounts.module';
+import { AccountsService } from 'src/accounts/accounts.service';
+import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma.service';
 import { TransfersController } from './transfers.controller';
 import { TransfersService } from './transfers.service';
 
 @Module({
-  providers: [TransfersService, PrismaService],
+  providers: [TransfersService, PrismaService, AuthService, AccountsService],
   controllers: [TransfersController],
-  imports: [AccountsModule],
 })
 export class TransfersModule {}
