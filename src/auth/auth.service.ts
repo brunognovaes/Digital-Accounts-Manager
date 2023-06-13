@@ -73,12 +73,15 @@ export class AuthService implements IAuthService {
       throw authErrors.INVALID_CREDENTIALS;
     }
 
+    const fiveMinutesInSeconds = 300;
+
     const token = await this.jwtService.signAsync(
       {
         user,
       },
       {
         secret: process.env.SECRET,
+        expiresIn: fiveMinutesInSeconds,
       },
     );
 

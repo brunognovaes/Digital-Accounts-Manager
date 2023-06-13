@@ -6,19 +6,21 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { Public } from 'src/common/decorators/public-request.decorator';
+import authErrors from './auth.errors';
 import {
   IAuthController,
   IAuthService,
   ILogInResponse,
 } from './auth.interfaces';
 import { AuthService } from './auth.service';
-import { Request } from 'express';
-import authErrors from './auth.errors';
 
 @Controller('auth')
 export class AuthController implements IAuthController {
   constructor(@Inject(AuthService) private authService: IAuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post()
   async logIn(@Req() req: Request): Promise<ILogInResponse> {
