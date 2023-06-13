@@ -7,6 +7,9 @@ export enum ErrorCodes {
   MISSING_AUTHORIZATION = 'app.miss.auth',
   INCORRECT_SCHEMA = 'app.incr.schm',
   NOT_FOUND = 'app.not.found',
+  INACTIVE_ACCOUNT = 'acc.incv',
+  BLOCKED_ACCOUNT = 'acc.blck',
+  INSUFFICIENT_BALANCE = 'acc.insf.bal'
 }
 
 export class AppError extends Error {
