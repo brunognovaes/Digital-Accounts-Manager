@@ -10,14 +10,14 @@ import { IListTransfersFilterQuery, ITransfersService } from './transfers.interf
 export class TransfersService implements ITransfersService {
   constructor(@Inject(PrismaService) private prismaService: PrismaService) {}
 
-  create(data: CreateTransferDto, accountId: string): Promise<Transfer> {
+  create(data: CreateTransferDto): Promise<Transfer> {
     return this.prismaService.transfer.create({
       data: {
         amount: data.amount,
         credit: data.credit,
         message: data.message,
         status: TransferStatus.PENDING,
-        account_id: accountId,
+        account_id: data.accountId,
       }
     })
   }

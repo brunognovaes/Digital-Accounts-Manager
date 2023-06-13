@@ -68,8 +68,9 @@ describe('TransfersService', () => {
        const response = transfersService.create({
         amount: mockAmount,
         credit: true,
-        message: mockMessage
-       }, mockAccountId)
+        message: mockMessage,
+        accountId: mockAccountId
+       })
  
        expect(response).resolves.toBeDefined()
        expect(response).resolves.toEqual(mockTransfer)
