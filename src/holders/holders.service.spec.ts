@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HoldersService } from './holders.service';
 import { AppError } from 'src/common/error/app.error';
-import holdersErrors from './holders.errors';
 import { PrismaService } from 'src/prisma.service';
+import holdersErrors from './holders.errors';
+import { HoldersService } from './holders.service';
 
 const mockName = 'name';
 const mockDocument = 'document';
@@ -109,7 +109,8 @@ describe('HoldersService', () => {
     it('should delete a holder successfully', () => {
       const response = holdersService.delete(mockId);
 
-      expect(response).resolves.not.toBeDefined();
+      expect(response).resolves.toBeDefined();
+      expect(response).resolves.toEqual(mockHolder)
     });
 
     it('should throw an error when holder not found', () => {
