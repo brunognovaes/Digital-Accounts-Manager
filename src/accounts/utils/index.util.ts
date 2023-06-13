@@ -1,1 +1,1 @@
-export const DEFAULT_BRANCH = '0001'
+export const DEFAULT_BRANCH = '0001';

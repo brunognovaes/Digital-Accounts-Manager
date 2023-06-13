@@ -5,6 +5,6 @@ import { HoldersService } from './holders.service';
 
 @Module({
   providers: [HoldersService, PrismaService],
-  controllers: [HoldersController]
+  controllers: [HoldersController],
 })
 export class HoldersModule {}

@@ -22,7 +22,7 @@ const mockPrisma = {
   credential: {
     findUnique: async () => mockCredential,
     create: async () => mockCredential,
-    delete: async () => mockCredential
+    delete: async () => mockCredential,
   },
 };
 
@@ -137,21 +137,21 @@ describe('AuthService', () => {
 
   describe('delete', () => {
     it('should delete a user that exists', () => {
-      const response = authService.delete(mockUser)
+      const response = authService.delete(mockUser);
 
-      expect(response).resolves.not.toBeDefined()
-    })
+      expect(response).resolves.not.toBeDefined();
+    });
 
     it('should throw an error when credential not found', () => {
       jest
-      .spyOn(mockPrisma.credential, 'findUnique')
-      .mockImplementation(async () => null);
+        .spyOn(mockPrisma.credential, 'findUnique')
+        .mockImplementation(async () => null);
 
-      const response = authService.delete(mockUser)
+      const response = authService.delete(mockUser);
 
       expect(response).rejects.toBeDefined();
       expect(response).rejects.toThrowError(AppError);
       expect(response).rejects.toEqual(authErrors.NOT_FOUND);
-    })
-  })
+    });
+  });
 });

@@ -7,6 +7,6 @@ import { TransfersService } from './transfers.service';
 @Module({
   providers: [TransfersService, PrismaService],
   controllers: [TransfersController],
-  imports: [AccountsModule]
+  imports: [AccountsModule],
 })
 export class TransfersModule {}

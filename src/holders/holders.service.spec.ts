@@ -110,7 +110,7 @@ describe('HoldersService', () => {
       const response = holdersService.delete(mockId);
 
       expect(response).resolves.toBeDefined();
-      expect(response).resolves.toEqual(mockHolder)
+      expect(response).resolves.toEqual(mockHolder);
     });
 
     it('should throw an error when holder not found', () => {

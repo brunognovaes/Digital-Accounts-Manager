@@ -4,7 +4,10 @@ import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTransferDto } from './dtos/create-transfer.dto';
 import transfersErrors from './transfers.errors';
-import { IListTransfersFilterQuery, ITransfersService } from './transfers.interfaces';
+import {
+  IListTransfersFilterQuery,
+  ITransfersService,
+} from './transfers.interfaces';
 
 @Injectable()
 export class TransfersService implements ITransfersService {
@@ -18,42 +21,44 @@ export class TransfersService implements ITransfersService {
         message: data.message,
         status: TransferStatus.PENDING,
         account_id: data.accountId,
-      }
-    })
+      },
+    });
   }
 
   async getById(id: string): Promise<Transfer> {
     const transfer = await this.prismaService.transfer.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!transfer) {
-      throw transfersErrors.NOT_FOUND
+      throw transfersErrors.NOT_FOUND;
     }
 
-    return transfer
+    return transfer;
   }
 
-  async list(queries: IListTransfersFilterQuery): Promise<IPaginatedResponse<Transfer>> {
+  async list(
+    queries: IListTransfersFilterQuery,
+  ): Promise<IPaginatedResponse<Transfer>> {
     const orderBy = {
       created_at: queries.order,
     };
     const skip = queries.itemsPerPage * queries.page;
     const take = queries.itemsPerPage;
-    const gte = new Date(queries.startDate)
-    const lte = new Date(new Date(queries.endDate).setUTCHours(23, 59, 59, 59))
+    const gte = new Date(queries.startDate);
+    const lte = new Date(new Date(queries.endDate).setUTCHours(23, 59, 59, 59));
     const where = {
       created_at: {
         ...(queries.startDate && { gte }),
         ...(queries.endDate && { lte }),
-        },
-      ...(queries.accountId && { account_id: queries.accountId })
-    }
+      },
+      ...(queries.accountId && { account_id: queries.accountId }),
+    };
 
     const maxItems = await this.prismaService.transfer.count({
-      where
+      where,
     });
     const maxPage = Math.floor(maxItems / queries.itemsPerPage) - 1;
 
@@ -64,20 +69,22 @@ export class TransfersService implements ITransfersService {
       take,
     });
 
-    return { values: transfers, metadata: {
-      currentItems: transfers.length,
-      maxPage,
-      order: queries.order,
-      page: queries.page,
-    } 
-  }
+    return {
+      values: transfers,
+      metadata: {
+        currentItems: transfers.length,
+        maxPage,
+        order: queries.order,
+        page: queries.page,
+      },
+    };
   }
 
   async processStatus(id: string, status: TransferStatus): Promise<Transfer> {
-    const transfer = await this.getById(id)
+    const transfer = await this.getById(id);
 
     if (transfer.status !== TransferStatus.PENDING) {
-      throw transfersErrors.ALREADY_PROCESSED
+      throw transfersErrors.ALREADY_PROCESSED;
     }
 
     return this.prismaService.transfer.update({
@@ -85,8 +92,8 @@ export class TransfersService implements ITransfersService {
         id: id,
       },
       data: {
-        status
-      }
-    })
+        status,
+      },
+    });
   }
 }

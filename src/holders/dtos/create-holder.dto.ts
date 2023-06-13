@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsStrongPassword,
-  Length,
-  MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { IsValidDocument } from 'src/common/validators/document.validator';
 
 export class CreateHolderDto {

@@ -1,8 +1,9 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { IsValidDocument } from 'src/common/validators/document.validator';
 
 export class CreateAccountDto {
   @IsString()
   @IsNotEmpty()
-  @IsUUID()
-  holder_id: string;
+  @IsValidDocument()
+  document: string;
 }

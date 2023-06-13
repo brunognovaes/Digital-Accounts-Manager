@@ -28,9 +28,9 @@ export class AuthService implements IAuthService {
 
     await this.prismaService.credential.delete({
       where: {
-        user
-      }
-    })
+        user,
+      },
+    });
   }
 
   async signIn(user: string, pass: string): Promise<Credential> {

@@ -1,20 +1,27 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from "class-validator"
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateTransferDto {
   @IsNotEmpty()
   @IsString()
   @IsUUID()
-  accountId: string
+  accountId: string;
 
   @IsNotEmpty()
   @IsBoolean()
-  credit: boolean
+  credit: boolean;
 
   @IsNotEmpty()
-  @IsNumber({maxDecimalPlaces: 2})
-  amount: number
+  @IsNumber({ maxDecimalPlaces: 2 })
+  amount: number;
 
   @IsOptional()
   @IsString()
-  message?: string
+  message?: string;
 }

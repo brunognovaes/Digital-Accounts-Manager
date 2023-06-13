@@ -1,4 +1,13 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Inject, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { Holder } from '@prisma/client';
 import { IAuthService } from 'src/auth/auth.interfaces';
 import { AuthService } from 'src/auth/auth.service';
@@ -10,33 +19,32 @@ import { HoldersService } from './holders.service';
 export class HoldersController implements IHoldersController {
   constructor(
     @Inject(HoldersService) private holdersService: IHoldersService,
-    @Inject(AuthService) private authService: IAuthService
-    ) {}
+    @Inject(AuthService) private authService: IAuthService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(data: CreateHolderDto): Promise<Holder> {
-    await this.authService.signIn(data.document, data.password)
-    return this.holdersService.create(data)
+    await this.authService.signIn(data.document, data.password);
+    return this.holdersService.create(data);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   getById(@Param('id') id: string): Promise<Holder> {
-    return this.holdersService.getById(id)
+    return this.holdersService.getById(id);
   }
 
   @Get('document/:document')
   @HttpCode(HttpStatus.OK)
   getByDocument(@Param('document') document: string): Promise<Holder> {
-    return this.holdersService.getByDocument(document)
+    return this.holdersService.getByDocument(document);
   }
 
-  
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(id: string): Promise<void> {
-    const holder = await this.holdersService.delete(id)
-    await this.authService.delete(holder.document)
+    const holder = await this.holdersService.delete(id);
+    await this.authService.delete(holder.document);
   }
 }

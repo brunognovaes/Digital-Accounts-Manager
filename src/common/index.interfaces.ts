@@ -1,13 +1,13 @@
-import { Prisma } from "@prisma/client"
+import { Prisma } from '@prisma/client';
 
 export interface IFilterQueryMetadataResponse {
-  currentItems: number
-  order: Prisma.SortOrder
-  page: number
-  maxPage: number
+  currentItems: number;
+  order: Prisma.SortOrder;
+  page: number;
+  maxPage: number;
 }
 
 export interface IPaginatedResponse<T> {
-  values: T[],
-  metadata: IFilterQueryMetadataResponse
+  values: T[];
+  metadata: IFilterQueryMetadataResponse;
 }

@@ -3,7 +3,11 @@ import { Account, Prisma } from '@prisma/client';
 import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { PrismaService } from 'src/prisma.service';
 import accountsErrors from './accounts.errors';
-import { IAccountsService, IListAccountsFilterQuery, IUpdateBalanceReturn } from './accounts.interfaces';
+import {
+  IAccountsService,
+  IListAccountsFilterQuery,
+  IUpdateBalanceReturn,
+} from './accounts.interfaces';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 import { accountNumberGenerator } from './utils/account-number-generator.util';
 import { DEFAULT_BRANCH } from './utils/index.util';
@@ -13,9 +17,9 @@ export class AccountsService implements IAccountsService {
   constructor(@Inject(PrismaService) private prismaService: PrismaService) {}
 
   create(holderId: string): Promise<Account> {
-    const accountLength = 10
-    const accountNumber = accountNumberGenerator(accountLength)
-    
+    const accountLength = 10;
+    const accountNumber = accountNumberGenerator(accountLength);
+
     return this.prismaService.account.create({
       data: {
         holder_id: holderId,
@@ -24,28 +28,30 @@ export class AccountsService implements IAccountsService {
         number: accountNumber,
         active: true,
         blocked: false,
-      }
-    })
+      },
+    });
   }
 
-  async list(queries: IListAccountsFilterQuery): Promise<IPaginatedResponse<Account>> {
+  async list(
+    queries: IListAccountsFilterQuery,
+  ): Promise<IPaginatedResponse<Account>> {
     const orderBy = {
       created_at: queries.order,
     };
     const skip = queries.itemsPerPage * queries.page;
     const take = queries.itemsPerPage;
-    const gte = new Date(queries.startDate)
-    const lte = new Date(new Date(queries.endDate).setUTCHours(23, 59, 59, 59))
+    const gte = new Date(queries.startDate);
+    const lte = new Date(new Date(queries.endDate).setUTCHours(23, 59, 59, 59));
     const where = {
       created_at: {
         ...(queries.startDate && { gte }),
         ...(queries.endDate && { lte }),
-        },
-      ...(queries.holderId && { holder_id: queries.holderId })
-    }
+      },
+      ...(queries.holderId && { holder_id: queries.holderId }),
+    };
 
     const maxItems = await this.prismaService.account.count({
-      where
+      where,
     });
     const maxPage = Math.floor(maxItems / queries.itemsPerPage) - 1;
 
@@ -56,100 +62,110 @@ export class AccountsService implements IAccountsService {
       take,
     });
 
-    return { values: accounts, metadata: {
-      currentItems: accounts.length,
-      maxPage,
-      order: queries.order,
-      page: queries.page,
-    } 
+    return {
+      values: accounts,
+      metadata: {
+        currentItems: accounts.length,
+        maxPage,
+        order: queries.order,
+        page: queries.page,
+      },
+    };
   }
-}
 
   async getById(id: string): Promise<Account> {
     const account = await this.prismaService.account.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!account) {
-      throw accountsErrors.NOT_FOUND
+      throw accountsErrors.NOT_FOUND;
     }
 
-    return account
+    return account;
   }
 
-  async cashIn(accountId: string, amount: number): Promise<IUpdateBalanceReturn> {
-    const account = await this.getById(accountId)
+  async cashIn(
+    accountId: string,
+    amount: number,
+  ): Promise<IUpdateBalanceReturn> {
+    const account = await this.getById(accountId);
 
     if (!account.active) {
-      throw accountsErrors.INACTIVE
+      throw accountsErrors.INACTIVE;
     }
 
     if (account.blocked) {
-      throw accountsErrors.BLOCKED
+      throw accountsErrors.BLOCKED;
     }
 
-    const oldBalance = account.balance.toNumber()
-    const newBalance = +(oldBalance + amount).toFixed(2)
+    const oldBalance = account.balance.toNumber();
+    const newBalance = +(oldBalance + amount).toFixed(2);
 
     await this.prismaService.account.update({
       where: {
-        id: accountId
+        id: accountId,
       },
       data: {
-        balance: newBalance
-      }
-    })
+        balance: newBalance,
+      },
+    });
 
     return {
       accountId,
       newBalance,
-      oldBalance
-    }
+      oldBalance,
+    };
   }
 
-  async cashOut(accountId: string, amount: number): Promise<IUpdateBalanceReturn> {
-    const account = await this.getById(accountId)
+  async cashOut(
+    accountId: string,
+    amount: number,
+  ): Promise<IUpdateBalanceReturn> {
+    const account = await this.getById(accountId);
 
     if (!account.active) {
-      throw accountsErrors.INACTIVE
+      throw accountsErrors.INACTIVE;
     }
 
     if (account.blocked) {
-      throw accountsErrors.BLOCKED
+      throw accountsErrors.BLOCKED;
     }
 
-    const oldBalance = account.balance.toNumber()
+    const oldBalance = account.balance.toNumber();
 
     if (oldBalance < amount) {
-      throw accountsErrors.NOT_ENOUGH_BALANCE
+      throw accountsErrors.NOT_ENOUGH_BALANCE;
     }
 
-    const newBalance = +(oldBalance - amount).toFixed(2)
-
+    const newBalance = +(oldBalance - amount).toFixed(2);
 
     await this.prismaService.account.update({
       where: {
-        id: accountId
+        id: accountId,
       },
       data: {
-        balance: newBalance
-      }
-    })
+        balance: newBalance,
+      },
+    });
 
     return {
       accountId,
       newBalance,
-      oldBalance
-    }
+      oldBalance,
+    };
   }
 
-  async updateConfigs(data: UpdateAccountDto, accountId: string): Promise<Account> {
-    const account = await this.getById(accountId)
+  async updateConfigs(
+    data: UpdateAccountDto,
+    accountId: string,
+  ): Promise<Account> {
+    const account = await this.getById(accountId);
 
     if (!account.active) {
-      throw accountsErrors.INACTIVE
+      throw accountsErrors.INACTIVE;
     }
 
     return this.prismaService.account.update({
@@ -158,8 +174,8 @@ export class AccountsService implements IAccountsService {
       },
       data: {
         ...(data.active !== null && { active: data.active }),
-        ...(data.blocked !== null && { blocked: data.blocked })
-      }
-    })
+        ...(data.blocked !== null && { blocked: data.blocked }),
+      },
+    });
   }
 }

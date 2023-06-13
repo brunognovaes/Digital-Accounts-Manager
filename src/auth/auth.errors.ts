@@ -25,6 +25,6 @@ export default {
   NOT_FOUND: new AppError(
     'Credentials not found.',
     HttpStatus.NOT_FOUND,
-    ErrorCodes.NOT_FOUND
-  )
+    ErrorCodes.NOT_FOUND,
+  ),
 };
