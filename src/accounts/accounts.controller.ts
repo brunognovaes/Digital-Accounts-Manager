@@ -6,18 +6,20 @@ import {
   HttpStatus,
   Inject,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
 import { Account } from '@prisma/client';
+import { FilterQueryDto } from 'src/common/dtos/filter-query.dto';
 import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { IHoldersService } from 'src/holders/holders.interfaces';
 import { HoldersService } from 'src/holders/holders.service';
 import {
   IAccountsController,
   IAccountsService,
-  IListAccountsFilterQuery,
+  IFormatedAccountResponse,
 } from './accounts.interfaces';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dtos/create-account.dto';
@@ -29,59 +31,99 @@ export class AccountsController implements IAccountsController {
     @Inject(HoldersService) private holdersService: IHoldersService,
   ) {}
 
-  @Post()
-  @HttpCode(HttpStatus.OK)
-  async create(@Body() data: CreateAccountDto): Promise<Account> {
-    const holder = await this.holdersService.getByDocument(data.document);
-
-    return this.accountsService.create(holder.id);
+  private formatAccount(acc: Account): IFormatedAccountResponse {
+    return {
+      id: acc.id,
+      holder_id: acc.holder_id,
+      balance: acc.balance.toNumber(),
+      number: acc.number,
+      branch: acc.branch,
+      active: acc.active,
+      blocked: acc.blocked,
+      created_at: acc.created_at,
+      updated_at: acc.updated_at,
+    };
   }
 
-  @Get(':holderId')
+  @Post()
   @HttpCode(HttpStatus.OK)
-  list(
-    @Query() queries: IListAccountsFilterQuery,
-    @Param('holderId') holderId: string,
-  ): Promise<IPaginatedResponse<Account>> {
-    return this.accountsService.list({ ...queries, holderId });
+  async create(
+    @Body() data: CreateAccountDto,
+  ): Promise<IFormatedAccountResponse> {
+    const holder = await this.holdersService.getByDocument(data.document);
+
+    const account = await this.accountsService.create(holder.id);
+
+    return this.formatAccount(account);
+  }
+
+  @Get('holder/:holderId')
+  @HttpCode(HttpStatus.OK)
+  async list(
+    @Query() queries: FilterQueryDto,
+    @Param('holderId', ParseUUIDPipe) holderId: string,
+  ): Promise<IPaginatedResponse<IFormatedAccountResponse>> {
+    const response = await this.accountsService.list({ ...queries, holderId });
+    const accounts = response.values.map((acc) => this.formatAccount(acc));
+
+    return {
+      metadata: response.metadata,
+      values: accounts,
+    };
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  getById(@Param('id') id: string): Promise<Account> {
-    return this.accountsService.getById(id);
+  async getById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<IFormatedAccountResponse> {
+    const account = await this.accountsService.getById(id);
+
+    return this.formatAccount(account);
   }
 
-  @Patch(':id')
+  @Patch('close/:id')
   @HttpCode(HttpStatus.OK)
-  close(@Param('id') id: string): Promise<Account> {
-    return this.accountsService.updateConfigs(
+  async close(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<IFormatedAccountResponse> {
+    const account = await this.accountsService.updateConfigs(
       {
         active: false,
       },
       id,
     );
+
+    return this.formatAccount(account);
   }
 
-  @Patch(':id')
+  @Patch('block/:id')
   @HttpCode(HttpStatus.OK)
-  block(id: string): Promise<Account> {
-    return this.accountsService.updateConfigs(
+  async block(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<IFormatedAccountResponse> {
+    const account = await this.accountsService.updateConfigs(
       {
         blocked: true,
       },
       id,
     );
+
+    return this.formatAccount(account);
   }
 
-  @Patch(':id')
+  @Patch('unblock/:id')
   @HttpCode(HttpStatus.OK)
-  unblock(id: string): Promise<Account> {
-    return this.accountsService.updateConfigs(
+  async unblock(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<IFormatedAccountResponse> {
+    const account = await this.accountsService.updateConfigs(
       {
         blocked: false,
       },
       id,
     );
+
+    return this.formatAccount(account);
   }
 }

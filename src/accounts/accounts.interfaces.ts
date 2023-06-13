@@ -14,16 +14,28 @@ export interface IUpdateBalanceReturn {
   newBalance: number;
 }
 
+export interface IFormatedAccountResponse {
+  id: string;
+  holder_id: string;
+  number: string;
+  branch: string;
+  balance: number;
+  active: boolean;
+  blocked: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface IAccountsController {
-  create(data: CreateAccountDto): Promise<Account>;
+  create(data: CreateAccountDto): Promise<IFormatedAccountResponse>;
   list(
     queries: FilterQueryDto,
     holderId: string,
-  ): Promise<IPaginatedResponse<Account>>;
-  getById(id: string): Promise<Account>;
-  close(id: string): Promise<Account>;
-  block(id: string): Promise<Account>;
-  unblock(id: string): Promise<Account>;
+  ): Promise<IPaginatedResponse<IFormatedAccountResponse>>;
+  getById(id: string): Promise<IFormatedAccountResponse>;
+  close(id: string): Promise<IFormatedAccountResponse>;
+  block(id: string): Promise<IFormatedAccountResponse>;
+  unblock(id: string): Promise<IFormatedAccountResponse>;
 }
 
 export interface IAccountsService {

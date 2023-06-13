@@ -53,7 +53,7 @@ export class AccountsService implements IAccountsService {
     const maxItems = await this.prismaService.account.count({
       where,
     });
-    const maxPage = Math.floor(maxItems / queries.itemsPerPage) - 1;
+    const maxPage = Math.floor(maxItems / queries.itemsPerPage);
 
     const accounts = await this.prismaService.account.findMany({
       where,
