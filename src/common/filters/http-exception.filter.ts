@@ -1,7 +1,7 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
@@ -18,12 +18,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     console.log('HttpExceptionFilter: ', exception);
 
     const status = exception.getStatus();
+    const exceptionResponse = exception.getResponse() as any;
 
     httpAdapter.reply(
       response,
       {
         errorCode: ErrorCodes.UNKNOW,
-        message: exception.message,
+        message: exceptionResponse.message || exception.message,
       },
       status,
     );
