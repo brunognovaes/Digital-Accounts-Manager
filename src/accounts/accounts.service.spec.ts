@@ -67,7 +67,7 @@ describe('AccountsService', () => {
   });
 
   describe('create', () => {
-    it('should create a account successfully', () => {
+    it('should create an account successfully', () => {
      jest.mock("./utils/account-number-generator.util.ts", () => mockNumber)
 
       const response = accountsService.create(mockHolderId)

@@ -152,7 +152,7 @@ export class AccountsService implements IAccountsService {
       throw accountsErrors.INACTIVE
     }
 
-    return await this.prismaService.account.update({
+    return this.prismaService.account.update({
       where: {
         id: accountId,
       },
