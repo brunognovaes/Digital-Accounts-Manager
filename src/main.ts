@@ -1,9 +1,9 @@
+import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { GenericErrorFilter } from './common/filters/index.filter';
 import { AppErrorFilter } from './common/filters/app.filter';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { GenericErrorFilter } from './common/filters/index.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 const DEFAULT_PORT = 3000;
