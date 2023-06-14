@@ -1,38 +1,32 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Digital Accounts Manager
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Pré requisitos
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Para fazer o uso da aplicação será necessário ter uma instância de Postgres, caso não possua nenhuma, recomendo que faça uso do Docker e rode uma instância localmente.
 
-## Description
+[Instalar docker Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+[Instalar docker Windows](https://docs.docker.com/desktop/install/windows-install/)
 
-## Installation
+[Como rodar uma instância de postgres](https://www.code4it.dev/blog/run-postgresql-with-docker/)
+
+É necessário também informar as variáveis de ambiente em um arquivo `.env`, exemplos se encontram no arquivo `.env.example`.
+
+## Instalação
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+## Criando banco de dados
+
+É necessário que as informações de variáveis de ambiente estejam informadas.
+
+```bash
+$ npm run migration
+```
+
+## Iniciar aplicação
 
 ```bash
 # development
@@ -40,9 +34,6 @@ $ npm run start
 
 # watch mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
 ## Test
@@ -50,24 +41,41 @@ $ npm run start:prod
 ```bash
 # unit tests
 $ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
-## Support
+## O Projeto
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+O projeto se trata de um gerenciador de contas digitais com uma serie de funcionalidades. Foi separado em quatro módulos, cada um com suas resposabilidades.
+Projetado com o framework `NestJS`, utilizando algumas outras ferramentas, como por exemplo, `Prisma` e `Jest`.
 
-## Stay in touch
+### Auth
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+O serviço de autenticação é responsável por prover a possibilidade de registrar novas credenciais, autenticar login, e verificar autenticidade do token passado nas requisições.
 
-## License
+### Holders
 
-Nest is [MIT licensed](LICENSE).
+Gerencia a parte de titulares, que são gerenciados pelo seus documentos de forma única. Cada titular quando criado é solicitado uma senha e criado uma credencial pelo seu documento, todas as requisições em diante será solicitado a autenticação por meio de `Bearer token` gerado no endpoint de autorização.
+
+Com o cadastro de um titular é possível então fazer o gerenciamento de contas.
+
+### Accounts
+
+As contas são criadas a partir do documento de um titular, não sendo possível criar com um titular inexistente. É possível fazer o cadastro de múltiplas contas para um mesmo titular, consultar contas, bloquear, desbloquear, e inativa-las. Após a inativação de uma conta não será possível fazer mais nenhuma movimentação na mesma e nem reativa-la.
+
+Com a exclusão de um titular todas as contas cadastradas em cima serão desativadas.
+
+### Transfers
+
+O módulo de transferência gerencia a possibilidade de executar transações de entrada e saída em uma conta, fazendo validações de saldo e alterando para o novo valor.
+É criado também um histórico dessas transações, podendo fazer a consulta de extratos por meio de filtros.
+
+## Documentação
+
+É possível encontrar a documentação do projeto na pasta `docs` no arquivo `v1.yaml`, o swagger se encontra no padrão `openapi: 3.0.0` e pode ser facilmente visualizado por meio de ferramentas, como por exemplo:
+
+[Swagger Io](https://editor.swagger.io)
+
+## Contato
+
+- [Linkedin](https://www.linkedin.com/in/brunognovaes/)
+
