@@ -80,7 +80,9 @@ export class TransfersController implements ITransfersController {
         await this.transfersService.getDailyTotalByAccount(data.accountId)
       ).toNumber();
 
-      if (dailyAmount > 1000) {
+      const dailyLimit = 1000;
+
+      if (dailyAmount > dailyLimit) {
         throw transfersErrors.DAILY_TRANSFER_AMOUNT;
       }
 
