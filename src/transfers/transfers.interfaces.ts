@@ -1,4 +1,4 @@
-import { Transfer, TransferStatus } from '@prisma/client';
+import { Prisma, Transfer, TransferStatus } from '@prisma/client';
 import { FilterQueryDto } from 'src/common/dtos/filter-query.dto';
 import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { CreateTransferDto } from './dtos/create-transfer.dto';
@@ -29,6 +29,7 @@ export interface ITransfersService {
     status: TransferStatus,
     message?: string,
   ): Promise<Transfer>;
+  getDailyTotalByAccount(accountId: string): Promise<Prisma.Decimal>;
 }
 
 export interface ITransfersController {

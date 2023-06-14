@@ -72,6 +72,9 @@ const mockTransfersService = {
   create: jest.fn().mockImplementation(async () => mockTransfer),
   getById: jest.fn().mockImplementation(async () => mockTransfer),
   list: jest.fn().mockImplementation(async () => mockPaginatedResponse),
+  getDailyTotalByAccount: jest
+    .fn()
+    .mockImplementation(async () => new Prisma.Decimal(mockAmount)),
 };
 
 describe('TransfersController', () => {

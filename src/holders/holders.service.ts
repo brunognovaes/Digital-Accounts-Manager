@@ -61,10 +61,8 @@ export class HoldersService implements IHoldersService {
       throw holdersErrors.ALREADY_REGISTERED;
     }
 
-    const holder = await this.prismaService.holder.create({
+    return await this.prismaService.holder.create({
       data,
     });
-
-    return holder;
   }
 }

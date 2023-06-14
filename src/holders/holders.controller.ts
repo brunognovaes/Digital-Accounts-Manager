@@ -14,6 +14,7 @@ import { Holder } from '@prisma/client';
 import { AccountsService } from 'src/accounts/accounts.service';
 import { IAuthService } from 'src/auth/auth.interfaces';
 import { AuthService } from 'src/auth/auth.service';
+import { Public } from 'src/common/decorators/public-request.decorator';
 import { CreateHolderDto } from './dtos/create-holder.dto';
 import { IHoldersController, IHoldersService } from './holders.interfaces';
 import { HoldersService } from './holders.service';
@@ -26,6 +27,7 @@ export class HoldersController implements IHoldersController {
     @Inject(AccountsService) private accountsService: AccountsService,
   ) {}
 
+  @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() data: CreateHolderDto): Promise<Holder> {

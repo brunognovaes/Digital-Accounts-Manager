@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Transfer, TransferStatus } from '@prisma/client';
+import { Prisma, Transfer, TransferStatus } from '@prisma/client';
 import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTransferDto } from './dtos/create-transfer.dto';
@@ -99,5 +99,27 @@ export class TransfersService implements ITransfersService {
         ...(message && { message }),
       },
     });
+  }
+
+  async getDailyTotalByAccount(accountId: string): Promise<Prisma.Decimal> {
+    const startDay = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+
+    const result = await this.prismaService.transfer.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        account_id: accountId,
+        credit: false,
+        status: {
+          in: [TransferStatus.APPROVED, TransferStatus.PENDING],
+        },
+        created_at: {
+          gte: startDay,
+        },
+      },
+    });
+
+    return result._sum.amount || new Prisma.Decimal(0);
   }
 }

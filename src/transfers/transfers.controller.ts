@@ -13,6 +13,7 @@ import { AccountsService } from 'src/accounts/accounts.service';
 import { FilterQueryDto } from 'src/common/dtos/filter-query.dto';
 import { IPaginatedResponse } from 'src/common/index.interfaces';
 import { CreateTransferDto } from './dtos/create-transfer.dto';
+import transfersErrors from './transfers.errors';
 import {
   IFormatedTransferResponse,
   ITransfersController,
@@ -74,6 +75,14 @@ export class TransfersController implements ITransfersController {
 
     try {
       transfer = await this.transfersService.create(data);
+
+      const dailyAmount = (
+        await this.transfersService.getDailyTotalByAccount(data.accountId)
+      ).toNumber();
+
+      if (dailyAmount > 1000) {
+        throw transfersErrors.DAILY_TRANSFER_AMOUNT;
+      }
 
       if (data.credit) {
         await this.accountsService.cashIn(data.accountId, data.amount);

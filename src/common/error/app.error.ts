@@ -11,6 +11,7 @@ export enum ErrorCodes {
   BLOCKED_ACCOUNT = 'acc.blck',
   INSUFFICIENT_BALANCE = 'acc.insf.bal',
   ALREADY_PROCESSED = 'tran.alrd.proc',
+  DAILY_AMOUNT = 'tran.dly.amnt',
 }
 
 export class AppError extends Error {

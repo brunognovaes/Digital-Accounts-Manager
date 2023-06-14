@@ -12,4 +12,9 @@ export default {
     HttpStatus.UNPROCESSABLE_ENTITY,
     ErrorCodes.ALREADY_PROCESSED,
   ),
+  DAILY_TRANSFER_AMOUNT: new AppError(
+    'Daily amount reached.',
+    HttpStatus.BAD_REQUEST,
+    ErrorCodes.DAILY_AMOUNT,
+  ),
 };

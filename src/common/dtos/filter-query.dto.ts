@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsNumber,
@@ -14,6 +15,7 @@ export const isValidStringDateRegex =
 export class FilterQueryDto {
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => +value)
   @Min(1)
   @Max(150)
   itemsPerPage = 10;
@@ -25,6 +27,7 @@ export class FilterQueryDto {
 
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => +value)
   @Min(0)
   page = 0;
 
