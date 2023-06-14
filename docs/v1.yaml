@@ -14,7 +14,7 @@ tags:
 paths:
   /auth:
     post:
-      description: A auth based o 'basic' schema
+      description: A auth based o 'basic' schema. User can be defined as holder document.
       tags:
         - Auth
       summary: Log in
