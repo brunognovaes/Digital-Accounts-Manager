@@ -1,0 +1,814 @@
+openapi: 3.0.0
+info:
+  title: DAM
+  version: 1.0.0
+  contact:
+    name: Bruno Gomes
+    email: brunognovaes.cm@gmail.com
+    url: https://github.com/brunognovaes
+tags:
+  - name: Auth
+  - name: Accounts
+  - name: Holders
+  - name: Transfers
+paths:
+  /auth:
+    post:
+      description: A auth based o 'basic' schema
+      tags:
+        - Auth
+      summary: Log in
+      requestBody:
+        content: {}
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/login-response-200'
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/auth-error-invalid-cred-401'
+                  - $ref: '#/components/schemas/auth-error-miss-auth-401'
+                  - $ref: '#/components/schemas/auth-error-invl-auth-401'
+                  - $ref: '#/components/schemas/auth-error-incrr-schema-401'
+        '409':
+          description: Conflict request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/auth-error-alrdy-regis-409'
+        '404':
+          description: Conflict request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/auth-error-not-found-404'        
+  /accounts:
+    post:
+      tags:
+        - Accounts
+      summary: Creates an account by holder document
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                document: '89641299620'
+      security:
+        - bearerAuth: []                
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/acc-account-response-200'
+        '409':
+          description: Conflict request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/holder-error-alrd-regis-409'
+  /accounts/holder/{holderId}:
+    get:
+      tags:
+        - Accounts
+      summary: List account by holder id
+      parameters:
+        - schemas:
+          $ref: "#/components/parameters/pageParam"
+        - schemas:
+          $ref: "#/components/parameters/itemsPerPageParam"
+        - schemas:
+          $ref: "#/components/parameters/orderParam"
+        - schemas:
+          $ref: "#/components/parameters/startDateParam"
+        - schemas:
+          $ref: "#/components/parameters/endDateParam"
+        - in: path
+          name: 'holderId'
+          required: true
+          schema:
+            type: string
+            example: 'aaaaaaa-bbbbbb-ccccc'
+      security:
+        - bearerAuth: []            
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-paginated-account-response-200'
+  /accounts/{accountId}:
+    get:
+      tags:
+        - Accounts
+      summary: Get account by id
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd
+      security:
+        - bearerAuth: []            
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-paginated-account-response-200'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-error-not-found-404'
+  /accounts/close/{accountId}:
+    patch:
+      tags:
+        - Accounts
+      summary: Close account by id
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd  
+      security:
+        - bearerAuth: []                
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-account-response-200'
+        '403':
+          description: Forbidden request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-error-inactive-403'   
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-error-not-found-404'                
+  /accounts/block/{accountId:
+    patch:
+      tags:
+        - Accounts
+      summary: Block account by id
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd
+      security:
+        - bearerAuth: []                  
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-account-response-200'
+        '403':
+          description: Forbidden request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-error-inactive-403'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-error-not-found-404'                
+  /accounts/unblock/{accountId}:
+    patch:
+      tags:
+        - Accounts
+      summary: Unblock account by id
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd 
+      security:
+        - bearerAuth: []                 
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-account-response-200'
+        '403':
+          description: Forbidden request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-error-inactive-403'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/acc-error-not-found-404'                
+  /holders:
+    post:
+      tags:
+        - Holders
+      summary: Creates a holder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:  
+                name:
+                  type: string
+                  example: Bruno Gomes
+                document:
+                  type: string
+                  example: '12345678910'
+                password:
+                  type: string
+                  example: '123123123'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/holder-response-200'
+        '409':
+          description: Conflict request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/auth-error-alrdy-regis-409'
+                  - $ref: '#/components/schemas/holder-error-alrd-regis-409'
+  /holders/{holderId}:
+    get:
+      tags:
+        - Holders
+      summary: Get holder by id
+      parameters:
+        - in: path
+          name: holderId
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd
+      security:
+        - bearerAuth: []            
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/holder-response-200'
+        '404':
+          description: Response not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/holder-error-not-found-404'
+    delete:
+      tags:
+        - Holders
+      summary: Delete holder by id
+      parameters:
+        - in: path
+          name: holderId
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd      
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/holder-response-200'
+        '404':
+          description: Response not found
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/holder-error-not-found-404'               
+                  - $ref: '#/components/schemas/auth-error-not-found-404'
+  /holders/document/{document}:
+    get:
+      tags:
+        - Holders
+      summary: Get by Document
+      parameters:
+        - in: path
+          name: document
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd    
+      security:
+        - bearerAuth: []              
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/holder-response-200'
+        '404':
+          description: Response not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/holder-error-not-found-404'                
+  /transfers/account/{accountId}:
+    get:
+      tags:
+        - Transfers
+      summary: List by account id
+      parameters:
+        - schemas:
+          $ref: "#/components/parameters/pageParam"
+        - schemas:
+          $ref: "#/components/parameters/itemsPerPageParam"
+        - schemas:
+          $ref: "#/components/parameters/orderParam"
+        - schemas:
+          $ref: "#/components/parameters/startDateParam"
+        - schemas:
+          $ref: "#/components/parameters/endDateParam"      
+        - in: path
+          name: 'accountId'
+          required: true
+          schema:
+            type: string
+            example: 'aaaaaaa-bbbbbb-ccccc'
+      security:
+        - bearerAuth: []            
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transfer-paginated-response-200'
+  /transfers:
+    post:
+      tags:
+        - Transfers
+      summary: Create a transfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+                  example: 'aaaaaaa-bbbbbb-ccccc'
+                credit:
+                  type: boolean
+                  example: true
+                amount:
+                  type: number
+                  example: 10.31
+      security:
+        - bearerAuth: []                  
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transfer-response-200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transfer-error-dly-amt-400'
+        '422':
+          description: Unprocessable request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/transfer-error-alrd-proc-422'
+                  - $ref: '#/components/schemas/acc-error-not-balance-422'
+        '403': 
+          description: Forbidden request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/acc-error-inactive-403'                         
+                  - $ref: '#/components/schemas/acc-error-blocked-403' 
+  /transfers/{accountId}:
+    get:
+      tags:
+        - Transfers
+      summary: Get transfer by id
+      parameters:
+        - in: path
+          name: transferId
+          required: true
+          schema:
+            type: string
+            example: aaaaaa-bbbbbb-ccccc-dddd
+      security:
+        - bearerAuth: []            
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transfer-response-200'
+        '404':
+          description: Response not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transfer-error-not-found-404'  
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: number
+        example: 0
+        minimum: 0
+        default: 0
+      description: The page to be accessed and return items
+    itemsPerPageParam:
+      name: itemsPerPage
+      in: query
+      required: false
+      schema:
+        type: number
+        example: 100
+        minimum: 1
+        maximum: 150
+        default: 10
+      description: Number of items to be returned
+    orderParam:
+      name: order
+      in: query
+      required: false
+      schema:
+        type: string
+        example: desc
+        enum:
+          - asc
+          - desc
+        default: desc
+      description: Option to sort items in ascending or descending order
+    startDateParam:
+      name: startDate
+      in: query
+      required: false
+      schema:
+        type: string
+        example: "2023-01-01"
+      description: Option to filter date by start, must be in format 'yyyy/mm/dd'
+    endDateParam:
+      name: endDate
+      in: query
+      required: false
+      schema:
+        type: string
+        example: "2023-01-01"
+      description: Option to filter date by end, must be in format 'yyyy/mm/dd'
+  schemas:
+    metadata-response-object:
+      type: object
+      properties:
+        currentItems:
+          type: number
+          example: 1
+        maxPage:
+          type: number
+          example: 1
+        order:
+          type: string
+          example: asc
+          enum:
+            - asc
+            - desc
+        page:
+          type: number
+          example: 0
+    login-response-200:
+      type: object
+      properties:
+        payload:
+          type: object
+          properties:
+            token:
+              type: string
+              example: abcabcabcabcabc
+    auth-error-invalid-cred-401:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: auth.inv.cred
+        message:
+          type: string
+          example: Invalid credentials.
+    auth-error-alrdy-regis-409:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.dupl.val
+        message:
+          type: string
+          example: User already registered.         
+    auth-error-miss-auth-401:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.miss.auth
+        message:
+          type: string
+          example: Missing authorization. 
+    auth-error-invl-auth-401:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: auth.inv.cred
+        message:
+          type: string
+          example: Invalid authorization.     
+    auth-error-incrr-schema-401:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.incr.schm
+        message:
+          type: string
+          example: Incorrect schema. It should be "basic".
+    auth-error-not-found-404:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.not.found
+        message:
+          type: string
+          example: Credentials not found.
+    account-schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: aaaaaa-bbbbbb-ccccc-dddd
+        holder_id:
+          type: string
+          example: aaaaaa-bbbbbb-ccccc-dddd
+        number:
+          type: string
+          example: '1234567890'
+        branch:
+          type: string
+          example: '0001'
+        balance:
+          type: number
+          example: 100.13
+        active:
+          type: boolean
+          example: true
+        blocked:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          example: '2023-06-14 00:00:00.000'
+        updated_at:
+          type: string
+          example: '2023-06-14 00:00:00.000'
+    acc-account-response-200:
+      type: object
+      properties:
+        payload:
+          $ref: '#/components/schemas/account-schema'
+    acc-paginated-account-response-200:
+      type: object
+      properties:
+        payload:
+          type: object
+          properties:
+            metadata:
+              $ref: '#/components/schemas/metadata-response-object'
+            "values":
+              type: array
+              items:
+                $ref: '#/components/schemas/account-schema'  
+    acc-error-not-found-404:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.not.found
+        message:
+          type: string
+          example: Account not found.          
+    acc-error-inactive-403:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: acc.incv
+        message:
+          type: string
+          example: Account is inactive.
+    acc-error-blocked-403:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: acc.blck
+        message:
+          type: string
+          example: Account is blocked.
+    acc-error-not-balance-422:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: acc.insf.bal
+        message:
+          type: string
+          example: Not enough balance.                                 
+    transfer-schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: aaaaaa-bbbbbb-ccccc-dddd
+        account_id:
+          type: string
+          example: aaaaaa-bbbbbb-ccccc-dddd   
+        amount:
+          type: number
+          example: 100.13       
+        credit:
+          type: boolean
+          example: true
+        status:
+          type: string
+          example: PENDING
+          enum:
+            - PENDING
+            - REFUSED
+            - APPROVED
+        message:
+          type: string
+          example: Daily amount reached.
+        created_at:
+          type: string
+          example: '2023-06-14 00:00:00.000'
+        updated_at:
+          type: string
+          example: '2023-06-14 00:00:00.000'
+    transfer-response-200:
+      type: object
+      properties:
+        payload:
+          $ref: '#/components/schemas/transfer-schema'
+    transfer-paginated-response-200:
+      type: object
+      properties:
+        payload:
+          type: object
+          properties:
+            metadata:
+              $ref: '#/components/schemas/metadata-response-object'
+            "values":
+              type: array
+              items:
+                $ref: '#/components/schemas/transfer-schema'           
+    transfer-error-not-found-404:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.not.found
+        message:
+          type: string
+          example: Transfer not found.   
+    transfer-error-alrd-proc-422:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: tran.alrd.proc
+        message:
+          type: string
+          example: Transfer already processed. 
+    transfer-error-dly-amt-400:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: tran.dly.amnt
+        message:
+          type: string
+          example: Daily amount reached.                              
+    holder-schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: aaaaaa-bbbbbb-ccccc-dddd
+        document: 
+          type: string
+          example: '12345678910'
+        name:
+          type: string
+          example: 'Bruno Gomes'
+        created_at:
+          type: string
+          example: '2023-06-14 00:00:00.000'
+        updated_at:
+          type: string
+          example: '2023-06-14 00:00:00.000'
+    holder-response-200:
+      type: object
+      properties:
+        payload:
+          $ref: '#/components/schemas/holder-schema'
+    holder-paginated-response-200:
+      type: object
+      properties:
+        payload:
+          type: object
+          properties:
+            metadata:
+              $ref: '#/components/schemas/metadata-response-object'
+            "values":
+              type: array
+              items:
+                $ref: '#/components/schemas/holder-schema'      
+    holder-error-alrd-regis-409:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.dupl.val
+        message:
+          type: string
+          example: Document already registered.
+    holder-error-not-found-404:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: app.not.found
+        message:
+          type: string
+          example: Holder not found.                        
