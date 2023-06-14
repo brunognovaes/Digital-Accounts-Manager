@@ -169,7 +169,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/acc-error-not-found-404'                
-  /accounts/block/{accountId:
+  /accounts/block/{accountId}:
     patch:
       tags:
         - Accounts
@@ -434,7 +434,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/acc-error-inactive-403'                         
                   - $ref: '#/components/schemas/acc-error-blocked-403' 
-  /transfers/{accountId}:
+  /transfers/{transferId}:
     get:
       tags:
         - Transfers
